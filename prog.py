@@ -1,6 +1,7 @@
 import tkinter as tk
 import tkinter.messagebox
 
+
 class App:
     def __init__(self, root):
         # Setting title
@@ -36,6 +37,23 @@ class App:
 
         self.is_active = False
 
+        ###
+        lbl1 = tk.Label(root, text="Морський Бій")
+        lbl1.place(x=200, y=10)
+        dictation = {1: 'a', 2: 'b', 3: 'c', 4: 'd', 5: 'e', 6: 'f', 7: 'g', 8: 'h', 9: 'i', 10: 'j'}
+        for col in range(1, 11):
+            lbl1 = tk.Label(root, text=dictation[col])
+            lbl1.place(x=start_x + col * button_size - button_size, y=start_y - button_size, width=button_size,
+                       height=button_size)
+
+        # for row in range(grid_size):
+        for row in range(1, 11):
+            lbl1 = tk.Label(root, text=str(row))
+            lbl1.place(x=start_x - button_size, y=start_y + row * button_size - button_size, width=button_size,
+                       height=button_size)
+
+
+    ###
     def grid_btn_onclick(self, row, col):
         print(f"Button {row},{col} clicked")
 
@@ -52,6 +70,7 @@ class App:
         if self.is_active:
             print("Updating time...")
             root.after(500, self.update_time)
+
 
 if __name__ == "__main__":
     root = tk.Tk()
