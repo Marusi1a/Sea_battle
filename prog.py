@@ -118,6 +118,49 @@ class App:
             len_ship = 1
             self.take_ship_row(row, col, len_ship)
 
+    def can_place_ship(self, grid, row, col, length, direction):
+        if direction == 'horizontal':
+            if col + length > 10:
+                return False
+            for i in range(length):
+                if grid[row][col + i]['text'] == '■':
+                    return False
+            for i in range(max(0, row-1), min(10, row+2)):
+                for j in range(max(0, col-1), min(10, col+length+1)):
+                    if grid[i][j]['text'] == '■':
+                        return False
+        elif direction == 'vertical':
+            if row + length > 10:
+                return False
+            for i in range(length):
+                if grid[row + i][col]['text'] == '■':
+                    return False
+            for i in range(max(0, row-1), min(10, row+length+1)):
+                for j in range(max(0, col-1), min(10, col+2)):
+                    if grid[i][j]['text'] == '■':
+                        return False
+        return True
+
+    def place_ship(self, grid, row, col, length, direction):
+        if direction == 'horizontal':
+            for i in range(length):
+                grid[row][col + i].config(bg='lightblue', text='■')
+        elif direction == 'vertical':
+            for i in range(length):
+                grid[row + i][col].config(bg='lightblue', text='■')
+
+    def place_random_ship(self, grid, length):
+        direction = random.choice(['horizontal', 'vertical'])
+        row, col = random.randint(0, 9), random.randint(0, 9)
+        while not self.can_place_ship(grid, row, col, length, direction):
+            direction = random.choice(['horizontal', 'vertical'])
+            row, col = random.randint(0, 9), random.randint(0, 9)
+        self.place_ship(grid, row, col, length, direction)
+
+    def place_all_ships(self, grid):
+        for length in [4, 3, 3, 2, 2, 2, 1, 1, 1, 1]:
+            self.place_random_ship(grid, length)
+
     def grid_btn_onclick(self, row, col):
         btn = self.buttons[row][col]
         if btn["bg"] == "light blue":
@@ -152,13 +195,8 @@ class App:
 
     def start_bnt_onclick1(self):
         self.is_active = True
-
-        random_row = random.randint(0, 9)
-        random_col = random.randint(0, 9)
-        random_button = self.buttons[random_row][random_col]
-        random_button.config(bg='lightblue', text="■")
-        lbl1 = tk.Label(root, text="Гра почалась!")
-        lbl1.place(x=200, y=10)
+        self.place_all_ships(self.buttons)
+        self.update_label("Гра почалась!")
 
 
 if __name__ == "__main__":
