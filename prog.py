@@ -29,11 +29,14 @@ class App:
                           height=button_size)
 
         # Create the start and stop buttons
+        start_btn = tk.Button(root, text="Почати гру", command=self.start_bnt_onclick)
+        start_btn.place(x=400, y=460, width=70, height=25)
+
         start_btn = tk.Button(root, text="Почати", command=self.start_bnt_onclick)
         start_btn.place(x=30, y=460, width=70, height=25)
 
         stop_btn = tk.Button(root, text="Наступна дія", command=self.stop_btn_onclick)
-        stop_btn.place(x=220, y=460, width=100, height=25)
+        stop_btn.place(x=200, y=460, width=100, height=25)
 
         self.is_active = False
 
@@ -46,12 +49,10 @@ class App:
             lbl1.place(x=start_x + col * button_size - button_size, y=start_y - button_size, width=button_size,
                        height=button_size)
 
-        # for row in range(grid_size):
         for row in range(1, 11):
             lbl1 = tk.Label(root, text=str(row))
             lbl1.place(x=start_x - button_size, y=start_y + row * button_size - button_size, width=button_size,
                        height=button_size)
-
 
     ###
     def grid_btn_onclick(self, row, col):
