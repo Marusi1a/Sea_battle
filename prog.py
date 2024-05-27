@@ -2,8 +2,7 @@ import tkinter as tk
 import tkinter.messagebox
 import random
 
-def on_button_click(row, col):
-    print(row, col)
+
 class App:
 
     def __init__(self, root):
@@ -30,13 +29,11 @@ class App:
         for row in range(grid_size):
             row_buttons = []
             for col in range(grid_size):
-                btn = tk.Button(root, text="0",command=lambda r=row,c= col:on_button_click(r,c))
+                btn = tk.Button(root, text="0", command=lambda r=row, c=col: self.on_button_click(r, c))
                 btn.place(x=start_x + col * button_size, y=start_y + row * button_size, width=button_size,
                           height=button_size)
                 row_buttons.append(btn)
             self.buttons.append(row_buttons)
-
-
 
         start_btn1 = tk.Button(root, text="Почати гру", command=self.start_bnt_onclick1)
         start_btn1.place(x=400, y=460, width=70, height=25)
@@ -47,7 +44,8 @@ class App:
         stop_btn.place(x=200, y=460, width=100, height=25)
 
         self.is_active = False
-        self.actions = ["", "Розтавляємо корабель по 4", "Розтавляємо корабель по 3", "Розтавляємо корабелі по 2"]
+        self.actions = ["", "Розтавляємо корабель по 4", "Розтавляємо корабель по 3", "Розтавляємо корабелі по 2",
+                        "Розтавляємо корабелі по 1"]
         self.current_action_index = 0
 
         self.lbl1 = tk.Label(root, text="Морський Бій")
@@ -64,6 +62,40 @@ class App:
             lbl1.place(x=start_x - button_size, y=start_y + row * button_size - button_size, width=button_size,
                        height=button_size)
 
+    def right_side_ship(self, col, len_ship):
+        return col + len_ship <= 10
+
+    def take_ship_row(self, row, col, len_ship):
+        for i in range(len_ship):
+            self.buttons[row][col + i].config(bg='lightblue', text="■")
+            self.buttons[row][col + i].config(state="disabled")
+            if row != 0:
+                self.buttons[row - 1][col + i].config(state="disabled", text="x")
+            if row != 9:
+                self.buttons[row + 1][col + i].config(state="disabled", text="x")
+        if col + len_ship < 10:
+            self.buttons[row - 1][col + len_ship].config(state="disabled", text="x")
+            self.buttons[row + 1][col + len_ship].config(state="disabled", text="x")
+            self.buttons[row][col + len_ship].config(state="disabled", text="x")
+        if col - 1 >= 0:
+            self.buttons[row - 1][col - 1].config(state="disabled", text="x")
+            self.buttons[row + 1][col - 1].config(state="disabled", text="x")
+            self.buttons[row][col - 1].config(state="disabled", text="x")
+
+    def on_button_click(self, row, col):
+        if self.current_action_index == 1:
+            len_ship = 4
+            if self.right_side_ship(col, len_ship):
+                self.take_ship_row(row, col, len_ship)
+        elif self.current_action_index == 2:
+            len_ship = 3
+            self.take_ship_row(row, col, len_ship)
+        elif self.current_action_index == 3:
+            len_ship = 2
+            self.take_ship_row(row, col, len_ship)
+        elif self.current_action_index == 4:
+            len_ship = 1
+            self.take_ship_row(row, col, len_ship)
 
     def grid_btn_onclick(self, row, col):
         btn = self.buttons[row][col]
@@ -73,15 +105,13 @@ class App:
         else:
             print(f"Button {row},{col} clicked")
 
-
     def start_btn_onclick(self):
         self.is_active = True
         self.current_action_index = max(0, self.current_action_index - 1)
         self.update_label(self.actions[self.current_action_index])
-       # lbl1 = tk.Label(root, text="Ready? START!")
-      #  lbl1.place(x=200, y=10)
 
-
+    # lbl1 = tk.Label(root, text="Ready? START!")
+    #  lbl1.place(x=200, y=10)
 
     def stop_btn_onclick(self):
         if not self.is_active:
