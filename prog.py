@@ -66,10 +66,7 @@ class App:
         self.is_active = False
         print("Stop button clicked")
 
-    def update_time(self):
-        if self.is_active:
-            print("Updating time...")
-            root.after(500, self.update_time)
+
 
 
 if __name__ == "__main__":
