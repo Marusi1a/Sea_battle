@@ -24,6 +24,7 @@ class App:
         start_y = (height - button_size * grid_size) // 2
 
         self.buttons = []
+        self.buttons_ships = []
 
         # Create the grid of buttons
         for row in range(grid_size):
@@ -33,7 +34,7 @@ class App:
                 btn.place(x=start_x * 1.5 + col * button_size, y=start_y + row * button_size, width=button_size,
                           height=button_size)
                 row_buttons.append(btn)
-            self.buttons.append(row_buttons)
+            self.buttons_ships.append(row_buttons)
 
         for row in range(grid_size):
             row_buttons = []
@@ -87,20 +88,20 @@ class App:
 
     def take_ship_row(self, row, col, len_ship):
         for i in range(len_ship):
-            self.buttons[row][col + i].config(bg='lightblue', text="■")
-            self.buttons[row][col + i].config(state="disabled")
+            self.buttons_ships[row][col + i].config(bg='lightblue', text="■")
+            self.buttons_ships[row][col + i].config(state="disabled")
             if row != 0:
-                self.buttons[row - 1][col + i].config(state="disabled", text="x")
+                self.buttons_ships[row - 1][col + i].config(state="disabled", text="x")
             if row != 9:
-                self.buttons[row + 1][col + i].config(state="disabled", text="x")
+                self.buttons_ships[row + 1][col + i].config(state="disabled", text="x")
         if col + len_ship < 10:
-            self.buttons[row - 1][col + len_ship].config(state="disabled", text="x")
-            self.buttons[row + 1][col + len_ship].config(state="disabled", text="x")
-            self.buttons[row][col + len_ship].config(state="disabled", text="x")
+            self.buttons_ships[row - 1][col + len_ship].config(state="disabled", text="x")
+            self.buttons_ships[row + 1][col + len_ship].config(state="disabled", text="x")
+            self.buttons_ships[row][col + len_ship].config(state="disabled", text="x")
         if col - 1 >= 0:
-            self.buttons[row - 1][col - 1].config(state="disabled", text="x")
-            self.buttons[row + 1][col - 1].config(state="disabled", text="x")
-            self.buttons[row][col - 1].config(state="disabled", text="x")
+            self.buttons_ships[row - 1][col - 1].config(state="disabled", text="x")
+            self.buttons_ships[row + 1][col - 1].config(state="disabled", text="x")
+            self.buttons_ships[row][col - 1].config(state="disabled", text="x")
 
     def on_button_click(self, row, col):
         if self.current_action_index == 1:
