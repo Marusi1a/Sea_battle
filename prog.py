@@ -1,6 +1,6 @@
 import tkinter as tk
 import tkinter.messagebox
-
+import random
 
 class App:
     def __init__(self, root):
@@ -21,12 +21,17 @@ class App:
         start_x = (width - button_size * grid_size) // 2
         start_y = (height - button_size * grid_size) // 2
 
+        self.buttons = []
+
         # Create the grid of buttons
         for row in range(grid_size):
+            row_buttons = []
             for col in range(grid_size):
                 btn = tk.Button(root, text="0")
                 btn.place(x=start_x + col * button_size, y=start_y + row * button_size, width=button_size,
                           height=button_size)
+                row_buttons.append(btn)
+            self.buttons.append(row_buttons)
 
         # Create the start and stop buttons
         start_btn = tk.Button(root, text="Почати гру", command=self.start_bnt_onclick)
@@ -63,6 +68,12 @@ class App:
         lbl1 = tk.Label(root, text="Ready? START!")
         lbl1.place(x=200, y=10)
 
+        # Вибір випадкової кнопки
+        random_row = random.randint(0, 9)
+        random_col = random.randint(0, 9)
+        random_button = self.buttons[random_row][random_col]
+        random_button.config(bg='light blue')
+
     def stop_btn_onclick(self):
         if self.start_clicked:
             self.is_active = False
@@ -72,6 +83,16 @@ class App:
             lbl1 = tk.Label(root, text="Спочатку натисніть кнопку 'Почати'")
             lbl1.place(x=200, y=10)
 
+    # def highlight_random_button():
+    #     # Вибираємо випадкову кнопку
+    #     random_button = random.choice(buttons)
+    #     # Виділяємо випадкову кнопку (змінюємо її колір)
+    #     random_button.config(bg='yellow')
+    #
+    # def create_buttons():
+    #     root = tk.Tk()
+    #     root.title("Random Button Selector")
+    #     select_button = tk.Button(root, text="Select Random Button", command=highlight_random_button)
 
 
 
