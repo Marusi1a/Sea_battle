@@ -59,12 +59,18 @@ class App:
 
     def start_bnt_onclick(self):
         self.is_active = True
-        print("Start button clicked")
-        root.after(500, self.update_time)
+        lbl1 = tk.Label(root, text="Ready? START!")
+        lbl1.place(x=200, y=10)
 
     def stop_btn_onclick(self):
-        self.is_active = False
-        print("Stop button clicked")
+        if self.start_clicked:
+            self.is_active = False
+            lbl1 = tk.Label(root, text="First, let's plase the ship of 4 cells" )
+            lbl1.place(x=200, y=10)
+        else:
+            lbl1 = tk.Label(root, text="Спочатку натисніть кнопку 'Почати'")
+            lbl1.place(x=200, y=10)
+
 
 
 
