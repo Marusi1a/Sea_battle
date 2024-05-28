@@ -45,9 +45,16 @@ class App:
                 row_buttons.append(btn)
             self.buttons.append(row_buttons)
 
+        self.ship_orientation = tk.BooleanVar()
+        self.ship_orientation.set(True)  # Початкове значення - горизонтальна орієнтація
+
+        self.radio_horizontal = tk.Radiobutton(root, text="Горизонтально", variable=self.ship_orientation, value=True)
+        self.radio_horizontal.place(x=30, y=400)
+
+        self.radio_vertical = tk.Radiobutton(root, text="Вертикально", variable=self.ship_orientation, value=False)
+        self.radio_vertical.place(x=30, y=430)
         start_btn1 = tk.Button(root, text="Почати гру", command=self.start_bnt_onclick1)
         start_btn1.place(x=700, y=460, width=70, height=25)
-
         start_btn = tk.Button(root, text="Почати", command=self.start_btn_onclick)
         start_btn.place(x=450, y=460, width=70, height=25)
         stop_btn = tk.Button(root, text="Наступна дія", command=self.stop_btn_onclick)
@@ -64,12 +71,12 @@ class App:
         dictation = {1: 'a', 2: 'b', 3: 'c', 4: 'd', 5: 'e', 6: 'f', 7: 'g', 8: 'h', 9: 'i', 10: 'j'}
         for col in range(1, 11):
             lbl1 = tk.Label(root, text=dictation[col])
-            lbl1.place(x=start_x* 1.5 + col * button_size - button_size, y=start_y - button_size, width=button_size,
+            lbl1.place(x=start_x * 1.5 + col * button_size - button_size, y=start_y - button_size, width=button_size,
                        height=button_size)
 
         for row in range(1, 11):
             lbl1 = tk.Label(root, text=str(row))
-            lbl1.place(x=start_x*1.5 - button_size, y=start_y + row * button_size - button_size, width=button_size,
+            lbl1.place(x=start_x * 1.5 - button_size, y=start_y + row * button_size - button_size, width=button_size,
                        height=button_size)
 
         dictation = {1: 'a', 2: 'b', 3: 'c', 4: 'd', 5: 'e', 6: 'f', 7: 'g', 8: 'h', 9: 'i', 10: 'j'}
@@ -83,10 +90,33 @@ class App:
             lbl1.place(x=start_x * 0.5 - button_size, y=start_y + row * button_size - button_size, width=button_size,
                        height=button_size)
 
+        self.ship_counts = {4: 1, 3: 2, 2: 3, 1: 4}
+        self.placed_ships = {4: 0, 3: 0, 2: 0, 1: 0}
+        self.previous_state = None  # Додай змінну для збереження попереднього стану
+
     def right_side_ship(self, col, len_ship):
         return col + len_ship <= 10
 
+    def down_ship(self, row, len_ship):
+        return row + len_ship <= 10
+
+    def can_place_ship_row(self, row, col, len_ship):
+        for i in range(len_ship):
+            if self.buttons[row][col + i].cget("text") == "x":
+                return False
+        return True
+
+    def can_place_ship_col(self, row, col, len_ship):
+        for i in range(len_ship):
+            if self.buttons[row + i][col].cget("text") == "x":
+                return False
+        return True
+
     def take_ship_row(self, row, col, len_ship):
+        if not self.can_place_ship_row(row, col, len_ship):
+            tk.messagebox.showwarning("Помилка", "Неможливо розташувати корабель тут!")
+            return
+
         for i in range(len_ship):
             self.buttons_ships[row][col + i].config(bg='lightblue', text="■")
             self.buttons_ships[row][col + i].config(state="disabled")
@@ -94,29 +124,67 @@ class App:
                 self.buttons_ships[row - 1][col + i].config(state="disabled", text="x")
             if row != 9:
                 self.buttons_ships[row + 1][col + i].config(state="disabled", text="x")
+
         if col + len_ship < 10:
-            self.buttons_ships[row - 1][col + len_ship].config(state="disabled", text="x")
-            self.buttons_ships[row + 1][col + len_ship].config(state="disabled", text="x")
+            if row != 0:
+                self.buttons_ships[row - 1][col + len_ship].config(state="disabled", text="x")
+            if row != 9:
+                self.buttons_ships[row + 1][col + len_ship].config(state="disabled", text="x")
             self.buttons_ships[row][col + len_ship].config(state="disabled", text="x")
         if col - 1 >= 0:
-            self.buttons_ships[row - 1][col - 1].config(state="disabled", text="x")
-            self.buttons_ships[row + 1][col - 1].config(state="disabled", text="x")
+            if row != 0:
+                self.buttons_ships[row - 1][col - 1].config(state="disabled", text="x")
+            if row != 9:
+                self.buttons_ships[row + 1][col - 1].config(state="disabled", text="x")
             self.buttons_ships[row][col - 1].config(state="disabled", text="x")
+
+        self.placed_ships[len_ship] += 1
+
+    def take_ship_col(self, row, col, len_ship):
+        if not self.can_place_ship_col(row, col, len_ship):
+            tk.messagebox.showwarning("Помилка", "Неможливо розташувати корабель тут!")
+            return
+
+        for i in range(len_ship):
+            self.buttons_ships[row + i][col].config(bg='lightblue', text="■")
+            self.buttons_ships[row + i][col].config(state="disabled")
+            if col != 0:
+                self.buttons_ships[row + i][col - 1].config(state="disabled", text="x")
+            if col != 9:
+                self.buttons_ships[row + i][col + 1].config(state="disabled", text="x")
+
+        if row + len_ship < 10:
+            if col != 0:
+                self.buttons_ships[row + len_ship][col - 1].config(state="disabled", text="x")
+            if col != 9:
+                self.buttons_ships[row + len_ship][col + 1].config(state="disabled", text="x")
+            self.buttons_ships[row + len_ship][col].config(state="disabled", text="x")
+        if row - 1 >= 0:
+            if col != 0:
+                self.buttons_ships[row - 1][col - 1].config(state="disabled", text="x")
+            if col != 9:
+                self.buttons_ships[row - 1][col + 1].config(state="disabled", text="x")
+            self.buttons_ships[row - 1][col].config(state="disabled", text="x")
+            self.placed_ships[len_ship] += 1
 
     def on_button_click(self, row, col):
         if self.current_action_index == 1:
             len_ship = 4
-            if self.right_side_ship(col, len_ship):
-                self.take_ship_row(row, col, len_ship)
         elif self.current_action_index == 2:
             len_ship = 3
-            self.take_ship_row(row, col, len_ship)
         elif self.current_action_index == 3:
             len_ship = 2
-            self.take_ship_row(row, col, len_ship)
         elif self.current_action_index == 4:
             len_ship = 1
-            self.take_ship_row(row, col, len_ship)
+        else:
+            return
+
+        if self.ship_orientation.get():  # Горизонтальне розміщення
+            if self.right_side_ship(col, len_ship):
+                self.take_ship_row(row, col, len_ship)
+        else:  # Вертикальне розміщення
+            if self.down_ship(row, len_ship):
+                self.take_ship_col(row, col, len_ship)
 
     def can_place_ship(self, grid, row, col, length, direction):
         if direction == 'horizontal':
@@ -125,8 +193,8 @@ class App:
             for i in range(length):
                 if grid[row][col + i]['text'] == '■':
                     return False
-            for i in range(max(0, row-1), min(10, row+2)):
-                for j in range(max(0, col-1), min(10, col+length+1)):
+            for i in range(max(0, row - 1), min(10, row + 2)):
+                for j in range(max(0, col - 1), min(10, col + length + 1)):
                     if grid[i][j]['text'] == '■':
                         return False
         elif direction == 'vertical':
@@ -135,8 +203,8 @@ class App:
             for i in range(length):
                 if grid[row + i][col]['text'] == '■':
                     return False
-            for i in range(max(0, row-1), min(10, row+length+1)):
-                for j in range(max(0, col-1), min(10, col+2)):
+            for i in range(max(0, row - 1), min(10, row + length + 1)):
+                for j in range(max(0, col - 1), min(10, col + 2)):
                     if grid[i][j]['text'] == '■':
                         return False
         return True
@@ -197,6 +265,25 @@ class App:
         self.is_active = True
         self.place_all_ships(self.buttons)
         self.update_label("Гра почалась!")
+
+    def place_ship_randomly_col(self, row, col, len_ship):
+        if self.down_ship(row, len_ship):
+            if self.ship_orientation.get():
+                col_ship = col
+                row_ship = row
+            else:
+                col_ship = row
+                row_ship = col
+            self.take_ship_col(row_ship, col_ship, len_ship)
+
+    def save_previous_state(self):
+        self.previous_state = []
+        for row in self.buttons:
+            row_state = []
+            for btn in row:
+                row_state.append((btn.cget("bg"), btn.cget("text"), btn["state"]))
+            self.previous_state.append(row_state)
+        self.undo_stack.append(self.previous_state)  # Додати попередній стан в стек
 
 
 if __name__ == "__main__":
