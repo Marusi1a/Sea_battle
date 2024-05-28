@@ -59,7 +59,8 @@ class App:
         start_btn.place(x=450, y=460, width=70, height=25)
         stop_btn = tk.Button(root, text="Наступна дія", command=self.stop_btn_onclick)
         stop_btn.place(x=550, y=460, width=100, height=25)
-
+        final_btn1 = tk.Button(root, text="В бій", command=self.finding_enemy)
+        final_btn1.place(x=780, y=460, width=70, height=25)
         self.is_active = False
         self.actions = ["", "Розтавляємо корабель по 4", "Розтавляємо корабель по 3", "Розтавляємо корабелі по 2",
                         "Розтавляємо корабелі по 1"]
@@ -288,6 +289,18 @@ class App:
                 row_state.append((btn.cget("bg"), btn.cget("text"), btn["state"]))
             self.previous_state.append(row_state)
         self.undo_stack.append(self.previous_state)
+
+    def finding_enemy(self):
+        for row in range(len(self.buttons)):
+            for col in range(len(self.buttons[row])):
+                btn = self.buttons[row][col]
+                if btn['state'] == 'normal':  # Перевіряємо, чи кнопка активована користувачем
+                    if self.buttons_ships[row][col]['text'] == '■':  # Влучення в корабель ворога
+                        btn.config(bg='red')
+                    else:
+                        btn.config(bg='pink')
+                    btn.config(state='disabled')  # Деактивуємо кнопку після натискання
+                    return
 
 
 if __name__ == "__main__":
