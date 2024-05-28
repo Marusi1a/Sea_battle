@@ -287,7 +287,7 @@ class App:
             for btn in row:
                 row_state.append((btn.cget("bg"), btn.cget("text"), btn["state"]))
             self.previous_state.append(row_state)
-        self.undo_stack.append(self.previous_state)  # Додати попередній стан в стек
+        self.undo_stack.append(self.previous_state)
 
 
 if __name__ == "__main__":
