@@ -34,7 +34,7 @@ class App:
                 btn.place(x=start_x * 1.5 + col * button_size, y=start_y + row * button_size, width=button_size,
                           height=button_size)
                 row_buttons.append(btn)
-            self.buttons_ships.append(row_buttons)
+            self.buttons.append(row_buttons)
 
         for row in range(grid_size):
             row_buttons = []
@@ -43,7 +43,7 @@ class App:
                 btn.place(x=start_x * 0.5 + col * button_size, y=start_y + row * button_size, width=button_size,
                           height=button_size)
                 row_buttons.append(btn)
-            self.buttons.append(row_buttons)
+            self.buttons_ships.append(row_buttons)
 
         self.ship_orientation = tk.BooleanVar()
         self.ship_orientation.set(True)  # Початкове значення - горизонтальна орієнтація
@@ -93,7 +93,8 @@ class App:
 
         self.ship_counts = {4: 1, 3: 2, 2: 3, 1: 4}
         self.placed_ships = {4: 0, 3: 0, 2: 0, 1: 0}
-        self.previous_state = None  # Додай змінну для збереження попереднього стану
+
+    # self.previous_state = None  # Додай змінну для збереження попереднього стану
 
     def right_side_ship(self, col, len_ship):
         return col + len_ship <= 10
@@ -109,9 +110,16 @@ class App:
 
     def can_place_ship_col(self, row, col, len_ship):
         for i in range(len_ship):
-            if self.buttons[row + i][col].cget("text") == "x":
+            if self.buttons_ships[row + i][col].cget("text") == "x":
                 return False
         return True
+
+    def cell_free(self, row, col):
+        state = self.buttons[row][col].cget("state")
+        if state == "normal":
+            return True
+        else:
+            return False
 
     def take_ship_row(self, row, col, len_ship):
         if not self.can_place_ship_row(row, col, len_ship):
@@ -119,25 +127,28 @@ class App:
             return
 
         for i in range(len_ship):
-            self.buttons_ships[row][col + i].config(bg='lightblue', text="■")
-            self.buttons_ships[row][col + i].config(state="disabled")
-            if row != 0:
-                self.buttons_ships[row - 1][col + i].config(state="disabled", text="x")
-            if row != 9:
-                self.buttons_ships[row + 1][col + i].config(state="disabled", text="x")
+            if self.cell_free(row, col + i):
+                self.buttons[row][col + i].config(bg='lightblue', text="■")
+                self.buttons[row][col + i].config(state="disabled")
+            if row != 0 and self.cell_free(row - 1, col + i):
+                self.buttons[row - 1][col + i].config(state="disabled", text="x")
+            if row != 9 and self.cell_free(row + 1, col + i):
+                self.buttons[row + 1][col + i].config(state="disabled", text="x")
 
         if col + len_ship < 10:
-            if row != 0:
-                self.buttons_ships[row - 1][col + len_ship].config(state="disabled", text="x")
-            if row != 9:
-                self.buttons_ships[row + 1][col + len_ship].config(state="disabled", text="x")
-            self.buttons_ships[row][col + len_ship].config(state="disabled", text="x")
+            if row != 0 and self.cell_free(row - 1, col + len_ship):
+                self.buttons[row - 1][col + len_ship].config(state="disabled", text="x")
+            if row != 9 and self.cell_free(row + 1, col + len_ship):
+                self.buttons[row + 1][col + len_ship].config(state="disabled", text="x")
+            if self.cell_free(row, col + len_ship):
+                self.buttons[row][col + len_ship].config(state="disabled", text="x")
         if col - 1 >= 0:
-            if row != 0:
-                self.buttons_ships[row - 1][col - 1].config(state="disabled", text="x")
-            if row != 9:
-                self.buttons_ships[row + 1][col - 1].config(state="disabled", text="x")
-            self.buttons_ships[row][col - 1].config(state="disabled", text="x")
+            if row != 0 and self.cell_free(row - 1, col -1):
+                self.buttons[row - 1][col - 1].config(state="disabled", text="x")
+            if row != 9 and self.cell_free(row + 1, col -1):
+                self.buttons[row + 1][col - 1].config(state="disabled", text="x")
+            if self.cell_free(row, col -1):
+                self.buttons[row][col - 1].config(state="disabled", text="x")
 
         self.placed_ships[len_ship] += 1
 
@@ -147,26 +158,27 @@ class App:
             return
 
         for i in range(len_ship):
-            self.buttons_ships[row + i][col].config(bg='lightblue', text="■")
-            self.buttons_ships[row + i][col].config(state="disabled")
+            self.buttons[row + i][col].config(bg='lightblue', text="■")
+            self.buttons[row + i][col].config(state="disabled")
             if col != 0:
-                self.buttons_ships[row + i][col - 1].config(state="disabled", text="x")
+                self.buttons[row + i][col - 1].config(state="disabled", text="x")
             if col != 9:
-                self.buttons_ships[row + i][col + 1].config(state="disabled", text="x")
+                self.buttons[row + i][col + 1].config(state="disabled", text="x")
 
         if row + len_ship < 10:
             if col != 0:
-                self.buttons_ships[row + len_ship][col - 1].config(state="disabled", text="x")
+                self.buttons[row + len_ship][col - 1].config(state="disabled", text="x")
             if col != 9:
-                self.buttons_ships[row + len_ship][col + 1].config(state="disabled", text="x")
-            self.buttons_ships[row + len_ship][col].config(state="disabled", text="x")
+                self.buttons[row + len_ship][col + 1].config(state="disabled", text="x")
+            self.buttons[row + len_ship][col].config(state="disabled", text="x")
         if row - 1 >= 0:
             if col != 0:
-                self.buttons_ships[row - 1][col - 1].config(state="disabled", text="x")
+                self.buttons[row - 1][col - 1].config(state="disabled", text="x")
             if col != 9:
-                self.buttons_ships[row - 1][col + 1].config(state="disabled", text="x")
-            self.buttons_ships[row - 1][col].config(state="disabled", text="x")
-            self.placed_ships[len_ship] += 1
+                self.buttons[row - 1][col + 1].config(state="disabled", text="x")
+            self.buttons[row - 1][col].config(state="disabled", text="x")
+
+        self.placed_ships[len_ship] += 1
 
     def on_button_click(self, row, col):
         if self.current_action_index == 1:
@@ -189,7 +201,6 @@ class App:
         else:  # Вертикальне розміщення
             if self.down_ship(row, len_ship):
                 self.take_ship_col(row, col, len_ship)
-
 
     def can_place_ship(self, grid, row, col, length, direction):
         if direction == 'horizontal':
@@ -235,7 +246,7 @@ class App:
             self.place_random_ship(grid, length)
 
     def grid_btn_onclick(self, row, col):
-        btn = self.buttons[row][col]
+        btn = self.buttons_ships[row][col]
         if btn["bg"] == "light blue":
             print(f"Button {row},{col} clicked - This is a special button")
             tk.messagebox.showinfo("Button Click", f"Button {row},{col} is special!")
@@ -268,7 +279,7 @@ class App:
 
     def start_bnt_onclick1(self):
         self.is_active = True
-        self.place_all_ships(self.buttons)
+        self.place_all_ships(self.buttons_ships)
         self.update_label("Гра почалась!")
 
     def place_ship_randomly_col(self, row, col, len_ship):
@@ -283,7 +294,7 @@ class App:
 
     def save_previous_state(self):
         self.previous_state = []
-        for row in self.buttons:
+        for row in self.buttons_ships:
             row_state = []
             for btn in row:
                 row_state.append((btn.cget("bg"), btn.cget("text"), btn["state"]))
@@ -293,14 +304,24 @@ class App:
     def finding_enemy(self):
         for row in range(len(self.buttons)):
             for col in range(len(self.buttons[row])):
-                btn = self.buttons[row][col]
-                if btn['state'] == 'normal':  # Перевіряємо, чи кнопка активована користувачем
-                    if self.buttons_ships[row][col]['text'] == '■':  # Влучення в корабель ворога
-                        btn.config(bg='red')
-                    else:
-                        btn.config(bg='pink')
-                    btn.config(state='disabled')  # Деактивуємо кнопку після натискання
-                    return
+                self.buttons[row][col].config(state = "normal")
+        x = random.randint(0, 10)
+        y = random.randint(0, 10)
+        btn = self.buttons[x][y]
+        if btn['state'] == 'normal':  # Перевіряємо, чи кнопка активована користувачем
+            if self.buttons[x][y]['text'] == '■':  # Влучення в корабель ворога
+                btn.config(bg='red')
+            else:
+                btn.config(bg='pink')
+            btn.config(state='disabled')  # Деактивуємо кнопку після натискання
+            return
+
+
+    def on_button_click_ships(self, row, col):
+        if self.buttons_ships[row][col]["text"] == "0":
+            self.buttons_ships[row][col].config(bg="pink")
+        else:
+            self.buttons_ships[row][col].config(bg="red")
 
 
 if __name__ == "__main__":
