@@ -110,7 +110,7 @@ class App:
 
     def can_place_ship_col(self, row, col, len_ship):
         for i in range(len_ship):
-            if self.buttons_ships[row + i][col].cget("text") == "x":
+            if self.buttons[row + i][col].cget("text") == "x":
                 return False
         return True
 
@@ -143,11 +143,11 @@ class App:
             if self.cell_free(row, col + len_ship):
                 self.buttons[row][col + len_ship].config(state="disabled", text="x")
         if col - 1 >= 0:
-            if row != 0 and self.cell_free(row - 1, col -1):
+            if row != 0 and self.cell_free(row - 1, col - 1):
                 self.buttons[row - 1][col - 1].config(state="disabled", text="x")
-            if row != 9 and self.cell_free(row + 1, col -1):
+            if row != 9 and self.cell_free(row + 1, col - 1):
                 self.buttons[row + 1][col - 1].config(state="disabled", text="x")
-            if self.cell_free(row, col -1):
+            if self.cell_free(row, col - 1):
                 self.buttons[row][col - 1].config(state="disabled", text="x")
 
         self.placed_ships[len_ship] += 1
@@ -158,25 +158,28 @@ class App:
             return
 
         for i in range(len_ship):
-            self.buttons[row + i][col].config(bg='lightblue', text="■")
-            self.buttons[row + i][col].config(state="disabled")
-            if col != 0:
+            if self.cell_free(row + i, col):
+                self.buttons[row + i][col].config(bg='lightblue', text="■")
+                self.buttons[row + i][col].config(state="disabled")
+            if col != 0 and self.cell_free(row + i, col - 1):
                 self.buttons[row + i][col - 1].config(state="disabled", text="x")
-            if col != 9:
+            if col != 9 and self.cell_free(row + i, col + 1):
                 self.buttons[row + i][col + 1].config(state="disabled", text="x")
 
         if row + len_ship < 10:
-            if col != 0:
+            if col != 0 and self.cell_free(row + len_ship, col - 1):
                 self.buttons[row + len_ship][col - 1].config(state="disabled", text="x")
-            if col != 9:
+            if col != 9 and self.cell_free(row + len_ship, col + 1):
                 self.buttons[row + len_ship][col + 1].config(state="disabled", text="x")
-            self.buttons[row + len_ship][col].config(state="disabled", text="x")
+            if self.cell_free(row + len_ship, col):
+                self.buttons[row + len_ship][col].config(state="disabled", text="x")
         if row - 1 >= 0:
-            if col != 0:
+            if col != 0 and self.cell_free(row - 1, col - 1):
                 self.buttons[row - 1][col - 1].config(state="disabled", text="x")
-            if col != 9:
+            if col != 9 and self.cell_free(row - 1, col + 1):
                 self.buttons[row - 1][col + 1].config(state="disabled", text="x")
-            self.buttons[row - 1][col].config(state="disabled", text="x")
+            if self.cell_free(row - 1, col):
+                self.buttons[row - 1][col].config(state="disabled", text="x")
 
         self.placed_ships[len_ship] += 1
 
