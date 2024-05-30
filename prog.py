@@ -22,6 +22,7 @@ class App:
         button_size = max_size // grid_size
         start_x = (width - button_size * grid_size) // 2
         start_y = (height - button_size * grid_size) // 2
+        self.user_miss = False
 
         self.buttons = []
         self.buttons_ships = []
@@ -39,7 +40,7 @@ class App:
         for row in range(grid_size):
             row_buttons = []
             for col in range(grid_size):
-                btn = tk.Button(root, text="0", command=lambda r=row, c=col: self.on_button_click(r, c))
+                btn = tk.Button(root, text="0", command=lambda r=row, c=col: self.on_button_click_pc(r, c))
                 btn.place(x=start_x * 0.5 + col * button_size, y=start_y + row * button_size, width=button_size,
                           height=button_size)
                 row_buttons.append(btn)
@@ -59,7 +60,7 @@ class App:
         start_btn.place(x=450, y=460, width=70, height=25)
         stop_btn = tk.Button(root, text="Наступна дія", command=self.stop_btn_onclick)
         stop_btn.place(x=550, y=460, width=100, height=25)
-        final_btn1 = tk.Button(root, text="В бій", command=self.finding_enemy)
+        final_btn1 = tk.Button(root, text="В бій", command=self.start_game)
         final_btn1.place(x=780, y=460, width=70, height=25)
         self.is_active = False
         self.actions = ["", "Розтавляємо корабель по 4", "Розтавляємо корабель по 3", "Розтавляємо корабелі по 2",
@@ -304,20 +305,41 @@ class App:
             self.previous_state.append(row_state)
         self.undo_stack.append(self.previous_state)
 
-    def finding_enemy(self):
-        for row in range(len(self.buttons)):
-            for col in range(len(self.buttons[row])):
-                self.buttons[row][col].config(state = "normal")
-        x = random.randint(0, 10)
-        y = random.randint(0, 10)
-        btn = self.buttons[x][y]
+    def atac(self, who, x, y):
+        if who == "user":
+            field = self.buttons_ships
+        elif who == "pc":
+            field = self.buttons
+        for row in range(len(field)):
+            for col in range(len(field[row])):
+                field[row][col].config(state="normal")
+        btn = field[x][y]
         if btn['state'] == 'normal':  # Перевіряємо, чи кнопка активована користувачем
-            if self.buttons[x][y]['text'] == '■':  # Влучення в корабель ворога
+            if field[x][y]['text'] == '■':  # Влучення в корабель ворога
                 btn.config(bg='red')
+                return True
             else:
                 btn.config(bg='pink')
+                return False
             btn.config(state='disabled')  # Деактивуємо кнопку після натискання
-            return
+
+
+    def start_game(self):
+        while not self.user_miss:
+            if not self.atac("pc", random.randint(0, 10), random.randint(0, 10)):
+                self.user_miss = True
+                break
+        # while True:
+        #     tk.messagebox.showwarning("Увага", "Комп'ютер зробив хід тепер ваша черга")
+        #     row, col = self.on_button_click_pc()
+        #     if not self.atac("user", row, col):
+        #         break
+
+    def on_button_click_pc(self, row, col):
+        while True:
+            if not self.atac("user", row, col):
+                self.user_miss = False
+                break
 
 
     def on_button_click_ships(self, row, col):
