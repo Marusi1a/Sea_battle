@@ -15,6 +15,7 @@ class App:
         screenheight = root.winfo_screenheight()
         alignstr = '%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, (screenheight - height) / 2)
         root.geometry(alignstr)
+        self.winner = None
         # root.resizable(width=False, height=False)
 
         grid_size = 10
@@ -22,7 +23,7 @@ class App:
         button_size = max_size // grid_size
         start_x = (width - button_size * grid_size) // 2
         start_y = (height - button_size * grid_size) // 2
-        self.user_miss = False
+        self.pc_game = True
 
         self.buttons = []
         self.buttons_ships = []
@@ -60,8 +61,8 @@ class App:
         start_btn.place(x=450, y=460, width=70, height=25)
         stop_btn = tk.Button(root, text="Наступна дія", command=self.stop_btn_onclick)
         stop_btn.place(x=550, y=460, width=100, height=25)
-        final_btn1 = tk.Button(root, text="В бій", command=self.start_game)
-        final_btn1.place(x=780, y=460, width=70, height=25)
+        self.final_btn1 = tk.Button(root, text="В бій", command=self.start_game)
+        self.final_btn1.place(x=780, y=460, width=70, height=25)
         self.is_active = False
         self.actions = ["", "Розтавляємо корабель по 4", "Розтавляємо корабель по 3", "Розтавляємо корабелі по 2",
                         "Розтавляємо корабелі по 1"]
@@ -317,36 +318,57 @@ class App:
         if btn['state'] == 'normal':  # Перевіряємо, чи кнопка активована користувачем
             if field[x][y]['text'] == '■':  # Влучення в корабель ворога
                 btn.config(bg='red')
+                btn.config(state='disabled')  # Деактивуємо кнопку після натискання
                 return True
             else:
                 btn.config(bg='pink')
+                btn.config(state='disabled')  # Деактивуємо кнопку після натискання
                 return False
-            btn.config(state='disabled')  # Деактивуємо кнопку після натискання
-
+        else:
+            return True
 
     def start_game(self):
-        while not self.user_miss:
-            if not self.atac("pc", random.randint(0, 10), random.randint(0, 10)):
-                self.user_miss = True
-                break
-        # while True:
-        #     tk.messagebox.showwarning("Увага", "Комп'ютер зробив хід тепер ваша черга")
-        #     row, col = self.on_button_click_pc()
-        #     if not self.atac("user", row, col):
-        #         break
+        self.final_btn1.config(state=tk.DISABLED)
+        self.play_game()
+
+    def play_end(self, who):
+        field = []
+        if who == "user":
+            field = self.buttons_ships
+        elif who == "pc":
+            field = self.buttons
+        for row in range(len(field)):
+            for col in range(len(field[row])):
+                if field[row][col].cget("text") == "■" and not field[row][col].cget("bg") == "red":
+                    return False
+        if who == "user":
+            self.winner = "Користувач"
+        else:
+            self.winner = "Комп'ютер"
+        return True
 
     def on_button_click_pc(self, row, col):
-        while True:
-            if not self.atac("user", row, col):
-                self.user_miss = False
-                break
+        if not self.atac("user", row, col):
+            self.pc_game = True
+            self.play_game()
+
+    def play_game(self):
+        while self.pc_game and not self.play_end("user")  and not self.play_end("pc") :
+            if not self.atac("pc", random.randint(0, 9), random.randint(0, 9)):
+                tk.messagebox.showwarning("Увага", "Комп'ютер зробив хід тепер ваша черга")
+                self.pc_game = False
+        if self.winner is not None:
+            for row in range(len(self.buttons_ships)):
+                for col in range(len(self.buttons_ships[row])):
+                    self.buttons_ships[row][col].config(state=tk.DISABLED)
+            for row in range(len(self.buttons)):
+                for col in range(len(self.buttons[row])):
+                    self.buttons[row][col].config(state=tk.DISABLED)
+            tk.messagebox.showwarning("Гру закінчено", f"{self.winner}, вітаємо з перемогою!")
 
 
-    def on_button_click_ships(self, row, col):
-        if self.buttons_ships[row][col]["text"] == "0":
-            self.buttons_ships[row][col].config(bg="pink")
-        else:
-            self.buttons_ships[row][col].config(bg="red")
+
+    
 
 
 if __name__ == "__main__":
