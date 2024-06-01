@@ -55,14 +55,14 @@ class App:
 
         self.radio_vertical = tk.Radiobutton(root, text="Вертикально", variable=self.ship_orientation, value=False)
         self.radio_vertical.place(x=30, y=430)
-        start_btn1 = tk.Button(root, text="Почати гру", command=self.start_bnt_onclick1)
-        start_btn1.place(x=700, y=460, width=70, height=25)
+        start_btn1 = tk.Button(root, text="Розтавити кораблі комп'ютера", command=self.start_bnt_onclick1)
+        start_btn1.place(x=590, y=460, width=200, height=25)
         start_btn = tk.Button(root, text="Почати", command=self.start_btn_onclick)
-        start_btn.place(x=450, y=460, width=70, height=25)
+        start_btn.place(x=400, y=460, width=70, height=25)
         stop_btn = tk.Button(root, text="Наступна дія", command=self.stop_btn_onclick)
-        stop_btn.place(x=550, y=460, width=100, height=25)
-        self.final_btn1 = tk.Button(root, text="Кінець гри", command=self.start_game)
-        self.final_btn1.place(x=780, y=460, width=70, height=25)
+        stop_btn.place(x=480, y=460, width=100, height=25)
+        self.final_btn1 = tk.Button(root, text="Розпочати гру", command=self.start_game)
+        self.final_btn1.place(x=780, y=460, width=100, height=25)
         self.is_active = False
         self.actions = ["", "Розтавляємо корабель по 4", "Розтавляємо корабель по 3", "Розтавляємо корабелі по 2",
                         "Розтавляємо корабелі по 1"]
