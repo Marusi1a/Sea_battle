@@ -72,6 +72,8 @@ class App:
         self.lbl1.place(x=500, y=10)
         self.lbl2= tk.Label(root, text="")
         self.lbl2.place(x=500, y=30)
+        self.lbl3 = tk.Label(root, text="")
+        self.lbl3.place(x=120, y=30)
 
         dictation = {1: 'a', 2: 'b', 3: 'c', 4: 'd', 5: 'e', 6: 'f', 7: 'g', 8: 'h', 9: 'i', 10: 'j'}
         for col in range(1, 11):
@@ -188,6 +190,7 @@ class App:
         self.placed_ships[len_ship] += 1
 
     def on_button_click(self, row, col):
+        self.lbl3.config(text="")
         if self.current_action_index == 1:
             len_ship = 4
         elif self.current_action_index == 2:
@@ -351,14 +354,16 @@ class App:
         return True
 
     def on_button_click_pc(self, row, col):
+        self.lbl3.config(text="")
         if not self.atac("user", row, col):
             self.pc_game = True
             self.play_game()
 
     def play_game(self):
+
         while self.pc_game and not self.play_end("user") and not self.play_end("pc"):
             if not self.atac("pc", random.randint(0, 9), random.randint(0, 9)):
-                tk.messagebox.showwarning("Увага", "Комп'ютер зробив хід тепер ваша черга")
+                self.lbl3.config(text=f"Комп'ютер зробив хід тепер ваша черга")
                 self.pc_game = False
         if self.winner is not None:
             for row in range(len(self.buttons_ships)):
